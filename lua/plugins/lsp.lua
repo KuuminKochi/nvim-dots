@@ -7,6 +7,14 @@ return {
                 end,
         },
 
+        {
+                'ziglang/zig.vim'
+        },
+
+        {
+                'NTBBloodbath/zig-tools.nvim'
+        },
+
         -- Optional: Mason LSP Configuration
         {
                 'williamboman/mason-lspconfig.nvim',
@@ -37,23 +45,15 @@ return {
                                 },
                         }
                         lspconfig.pyright.setup{} -- Setup for pyright
+                        lspconfig.kotlin_language_server.setup{} -- Setup for pyright
                         lspconfig.clangd.setup{
+                                cmd = {"clangd", "--compile-commands-dir=."},
                                 filetypes = {"c", "cpp", "arduino", "ino"}
                         }
-                        -- lspconfig.arduino_language_server.setup {
-                        --         cmd = {
-                        --                 "arduino-language-server",
-                        --                 "-clangd", "/usr/lib/llvm/19/bin/clangd",
-                        --                 "-cli", "/usr/bin/arduino_cli",
-                        --                 "-cli-config", "~/[1] Projects/NodeMCUTest/nano/sketch.yaml",
-                        --                 "-fqbn", "arduino:avr:nano",
-                        --         },
-                        --         filetypes = { "arduino", "ino" },
-                        --         capabilities = {
-                        --                 textDocument = { semanticTokens = vim.NIL },
-                        --                 workspace = { semanticTokens = vim.NIL },
-                        --         }
-                        -- }
+                        lspconfig.zls.setup{
+                                filetypes = {"zig", "zon"}
+                        }
+                        lspconfig.rust_analyzer.setup{}
                 end,
         },
 	-- Autocompletion framework
