@@ -26,7 +26,8 @@ local quotes = {
         'i think madame herta is wonderful.',
         'i wonder if i can integrate deepseek',
         'i paid for deepseek.',
-        'reasoning models are my saviour.'
+        'reasoning models are my saviour.',
+        'I should probably update this more.'
 }
 text = {
         workspace = function(opts)

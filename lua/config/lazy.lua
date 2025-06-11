@@ -29,9 +29,9 @@ local opt = vim.opt
 local keymap = vim.keymap
 
 opt.expandtab = true          -- Use spaces instead of tabs
-opt.shiftwidth = 8            -- Shift 8 spaces when indenting
-opt.tabstop = 8               -- 1 tab == 8 spaces
-opt.softtabstop = 8           -- Number of spaces a <Tab> counts for in insert mode
+opt.shiftwidth = 4            -- Shift 8 spaces when indenting
+opt.tabstop = 4               -- 1 tab == 8 spaces
+opt.softtabstop = 4           -- Number of spaces a <Tab> counts for in insert mode
 opt.linebreak = true
 opt.number = true             -- Show line numbers
 opt.relativenumber = true     -- Show relative line numbers
@@ -60,7 +60,7 @@ opt.colorcolumn = "80"        -- Highlight 80th column
 
 keymap.set('i', 'jk', '<Esc>', { noremap = true, silent = true })
 keymap.set('n', '<C-f>', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
-keymap.set('n', '<C-p>', ':Files<CR>', { noremap = true, silent = true }) -- Ctrl + P to open files
+keymap.set('n', '<C-p>', ':FZF<CR>', { noremap = true, silent = true }) -- Ctrl + P to open files
 keymap.set('n', '<A-t>', ':ToggleTerm size=40 direction=float<CR>', { noremap=true, silent = true })
 keymap.set('t', '<A-t>', 'exit<CR>exit<CR>', { noremap=true, silent = true })
 keymap.set('t', '<A-c>', 'arduino-cli compile --build-path ./build nano.ino<CR>', { noremap=true, silent = true })
@@ -78,5 +78,4 @@ require("lazy").setup({
 require("luasnip").filetype_extend("arduino", {"c", "cpp"})
 require("luasnip").filetype_extend("svelte", {"html", "javascript", "css"})
 require('Comment').setup()
-require("toggleterm").setup{}
 require("kanagawa").load("wave")

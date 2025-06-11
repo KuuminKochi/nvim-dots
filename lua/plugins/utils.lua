@@ -1,8 +1,8 @@
 return {
         -- File Explorer
-        {'akinsho/toggleterm.nvim', version = "*", config = true},
         {'numToStr/Comment.nvim'},
         { 'jiangmiao/auto-pairs' },
+        {'nvim-telescope/telescope.nvim'},
         {
                 'kyazdani42/nvim-tree.lua',
                 config = function()
@@ -12,9 +12,20 @@ return {
         },
 
         {
-                'junegunn/fzf.vim',  -- For fuzzy file finding
+                'junegunn/fzf',  -- For fuzzy file finding
                 config = function()
                 end,
         },
+
+        {
+                "chikko80/error-lens.nvim",
+                event = "BufRead",
+                dependencies = {
+                "nvim-telescope/telescope.nvim"
+                },
+                opts = {
+                -- your options go here
+                },
+        }
 
 }
