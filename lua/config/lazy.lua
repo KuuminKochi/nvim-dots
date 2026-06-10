@@ -21,10 +21,13 @@ vim.g.mapleader = ","
 vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
+local is_termux = vim.env.TERMUX_VERSION ~= nil
 require("lazy").setup({
         spec = {
                 { import = "plugins" },
         },
-        -- automatically check for plugin updates
-        checker = { enabled = true },
+        -- automatically check for plugin updates (disable on mobile to save battery/data)
+        checker = { enabled = not is_termux },
+        -- longer timeout for slow mobile connections
+        install = { missing = true, timeout = is_termux and 120 or 60 },
 })

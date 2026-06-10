@@ -3,8 +3,9 @@ return {
         "ellisonleao/gruvbox.nvim",
         priority = 1000,
         config = function()
+            local is_termux = vim.env.TERMUX_VERSION ~= nil
             require("gruvbox").setup({
-                terminal_colors = true, -- add neovim terminal colors
+                terminal_colors = true,
                 undercurl = false,
                 underline = false,
                 bold = true,
@@ -20,12 +21,12 @@ return {
                 invert_signs = false,
                 invert_tabline = false,
                 invert_intend_guides = false,
-                inverse = true, -- invert background for search, diffs, statuslines and errors
-                contrast = "hard", -- can be "soft", "medium" or "hard"
+                inverse = true,
+                contrast = is_termux and "medium" or "hard", -- softer contrast on mobile
                 palette_overrides = {},
                 overrides = {},
                 dim_inactive = false,
-                transparent_mode = false,
+                transparent_mode = is_termux, -- transparent looks better in Termux
             })
             vim.cmd("colorscheme gruvbox")
         end,

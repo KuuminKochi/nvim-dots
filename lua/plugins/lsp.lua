@@ -32,8 +32,11 @@ return {
                 severity_sort = true,
             })
 
-            -- Diagnostic signs
-            local signs = { Error = "✘", Warn = "▲", Hint = "⚑", Info = "ℹ" }
+            -- Diagnostic signs (ASCII fallback on Termux to avoid tofu boxes)
+            local is_termux = vim.env.TERMUX_VERSION ~= nil
+            local signs = is_termux
+                and { Error = "E", Warn = "W", Hint = "H", Info = "I" }
+                or  { Error = "✘", Warn = "▲", Hint = "⚑", Info = "ℹ" }
             for type, icon in pairs(signs) do
                 local hl = "DiagnosticSign" .. type
                 vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
