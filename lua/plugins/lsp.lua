@@ -1,111 +1,125 @@
 return {
--- Mason
-
+    -- Mason for managing LSPs and tools
     {
-        "elkowar/yuck.vim"
+        'williamboman/mason.nvim',
+        config = function()
+            require('mason').setup()
+        end,
     },
-
     {
-            'williamboman/mason.nvim',
-            config = function()
-    require('mason').setup()
-            end,
-    },
-    -- Optional: Mason LSP Configuration
-    {
-            'williamboman/mason-lspconfig.nvim',
-            dependencies = { 'williamboman/mason.nvim' },
-            config = function()
+        'williamboman/mason-lspconfig.nvim',
+        dependencies = { 'williamboman/mason.nvim' },
+        config = function()
             require('mason-lspconfig').setup({
-            ensure_installed = { 'lua_ls', 'pyright', 'clangd', 'marksman' }, -- Add your desired LSP servers here
+                ensure_installed = { 'lua_ls', 'pyright', 'clangd', 'html', 'cssls', 'marksman' },
+                automatic_enable = true,
             })
-            end,
+        end,
     },
 
-    -- Optional: LSP configuration (assuming you have nvim-lspconfig installed)
+    -- LSP Configuration
     {
-            'neovim/nvim-lspconfig',
-            dependencies = { 'williamboman/mason-lspconfig.nvim' },
-            config = function()
-                    local lspconfig = require('lspconfig')
-                    lspconfig.lua_ls.setup{
-                            settings = {
-                                    Lua = {
-                                            diagnostics = {
-                                                    globals = {
-                                                            "love",
-                                                            "vim",
-                                                    },
-                                            },
-                                    },
-                            },
-                    }
-                    lspconfig.pyright.setup{} -- Setup for pyright
-                    lspconfig.ts_ls.setup{} -- Setup for tsserver
-                    lspconfig.kotlin_language_server.setup{} -- Setup for pyright
-                    lspconfig.clangd.setup{
-                            cmd = {"clangd", "--compile-commands-dir=."},
-                            filetypes = {"c", "cpp", "arduino", "ino"}
-                    }
-                    lspconfig.zls.setup{
-                            filetypes = {"zig", "zon"}
-                    }
-                    lspconfig.rust_analyzer.setup{}
-                    lspconfig.hls.setup{}
-            end,
-    },
--- Autocompletion framework
-{
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-        'hrsh7th/cmp-nvim-lsp',   -- LSP source for nvim-cmp
-        'hrsh7th/cmp-buffer',     -- Buffer completions
-        'hrsh7th/cmp-path',       -- Path completions
-                    'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp
-        'frafamadriz/friendly-snippets', -- Snippets source
-        'L3MON4D3/LuaSnip',       -- Snippet engine
-    },
+        'neovim/nvim-lspconfig',
+        dependencies = { 'williamboman/mason-lspconfig.nvim' },
+        config = function()
+            -- Native diagnostic configuration
+            vim.diagnostic.config({
+                virtual_text = vim.env.TERM ~= "linux",  -- Inline text for GUI only
+                float = { border = "rounded" },          -- Floating windows for all
+                signs = true,
+                underline = true,
+                update_in_insert = false,
+                severity_sort = true,
+            })
 
-    config = function()
-        local cmp = require('cmp')
-        local luasnip = require('luasnip')
-                    require("luasnip.loaders.from_vscode").lazy_load()
-        cmp.setup {
-            snippet = {
-                expand = function(args)
-                    luasnip.lsp_expand(args.body) -- For `luasnip` users
+            -- Diagnostic signs
+            local signs = { Error = "✘", Warn = "▲", Hint = "⚑", Info = "ℹ" }
+            for type, icon in pairs(signs) do
+                local hl = "DiagnosticSign" .. type
+                vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+            end
+
+            -- Global LSP capabilities for nvim-cmp
+            vim.lsp.config('*', {
+                capabilities = require('cmp_nvim_lsp').default_capabilities(),
+            })
+
+            -- Server-specific overrides (merges with nvim-lspconfig defaults)
+            vim.lsp.config('lua_ls', {
+                settings = {
+                    Lua = {
+                        diagnostics = { globals = { "vim" } },
+                    },
+                },
+            })
+
+            vim.lsp.config('clangd', {
+                cmd = { "clangd", "--compile-commands-dir=." },
+                filetypes = { "c", "cpp" },
+            })
+
+            -- LSP Mappings (applied when LSP attaches)
+            vim.api.nvim_create_autocmd('LspAttach', {
+                group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+                callback = function(ev)
+                    local opts = { buffer = ev.buf }
+                    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+                    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+                    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+                    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+                    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
                 end,
-            },
-            mapping = {
-                ['<Tab>'] = cmp.mapping.select_next_item(),
-                ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-                ['<C-Space>'] = cmp.mapping.complete(),
-                ['<CR>'] = cmp.mapping.confirm { select = true },
-            },
-            sources = {
-                { name = 'nvim_lsp' },    -- LSP completion
-                { name = 'buffer' },      -- Buffer completion
-                { name = 'path' },        -- Path completion
-                { name = 'luasnip' },     -- Snippet completion
-            },
-        }
-    end,
-},
+            })
+        end,
+    },
 
+    -- Autocompletion
     {
-            'nvim-treesitter/nvim-treesitter',
-            build = ':TSUpdate',  -- Automatically install parsers
-            config = function()
-            require('nvim-treesitter.configs').setup {
-                    ensure_installed = { "lua", "python", "javascript", "html", "css" }, -- List of languages
-                    highlight = {
-                            enable = true,              -- Enable highlighting
-                            additional_vim_regex_highlighting = false,
-                    },
-            indent = {
-                    enable = true,              -- Enable indentation
-                    },
+        'hrsh7th/nvim-cmp',
+        dependencies = {
+            'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-buffer',
+            'hrsh7th/cmp-path',
+            'saadparwaiz1/cmp_luasnip',
+            'L3MON4D3/LuaSnip',
+        },
+        config = function()
+            local cmp = require('cmp')
+            local luasnip = require('luasnip')
+            require("luasnip.loaders.from_vscode").lazy_load()
+
+            cmp.setup {
+                snippet = {
+                    expand = function(args)
+                        luasnip.lsp_expand(args.body)
+                    end,
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ['<Tab>'] = cmp.mapping.select_next_item(),
+                    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+                    ['<C-Space>'] = cmp.mapping.complete(),
+                    ['<CR>'] = cmp.mapping.confirm { select = true },
+                }),
+                sources = {
+                    { name = 'nvim_lsp' },
+                    { name = 'luasnip' },
+                    { name = 'buffer' },
+                    { name = 'path' },
+                },
             }
-            end,
+        end,
+    },
+
+    -- Treesitter
+    {
+        'nvim-treesitter/nvim-treesitter',
+        build = ':TSUpdate',
+        config = function()
+            require('nvim-treesitter.configs').setup {
+                ensure_installed = { "lua", "python", "javascript", "html", "css", "c", "cpp", "markdown" },
+                highlight = { enable = true },
+                indent = { enable = true },
+            }
+        end,
     },
 }

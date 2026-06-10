@@ -1,31 +1,20 @@
 return {
-        -- File Explorer
-        {'numToStr/Comment.nvim'},
-        { 'jiangmiao/auto-pairs' },
-        {'nvim-telescope/telescope.nvim'},
         {
-                'kyazdani42/nvim-tree.lua',
+                'windwp/nvim-autopairs',
+                event = "InsertEnter",
                 config = function()
-                require('nvim-tree').setup()
-                -- Set keybindings for opening/closing nvim-tree
-                end,
+                        require('nvim-autopairs').setup({})
+                end
         },
-
         {
-                'junegunn/fzf',  -- For fuzzy file finding
+                'nvim-telescope/telescope.nvim',
+                dependencies = { 'nvim-lua/plenary.nvim' },
                 config = function()
-                end,
+                        require('telescope').setup({
+                            defaults = {
+                                borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+                            }
+                        })
+                end
         },
-
-        {
-                "chikko80/error-lens.nvim",
-                event = "BufRead",
-                dependencies = {
-                "nvim-telescope/telescope.nvim"
-                },
-                opts = {
-                -- your options go here
-                },
-        }
-
 }
